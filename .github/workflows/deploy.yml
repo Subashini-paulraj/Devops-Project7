@@ -25,7 +25,7 @@ jobs:
         
       - name: Build Docker Image
         run: |
-          docker build -t app .
+          docker build -t app project7-dashboard
           docker tag app:latest ${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Push Image to ECR
