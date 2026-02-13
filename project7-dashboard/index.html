@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud DevOps Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🚀 Cloud DevOps Deployment Dashboard</h1>
+        <button id="themeToggle">🌙 Toggle Theme</button>
+    </header>
+
+    <section class="environment">
+        <h2>Environment</h2>
+        <div class="env-buttons">
+            <button onclick="setEnvironment('DEV')">DEV</button>
+            <button onclick="setEnvironment('QA')">QA</button>
+            <button onclick="setEnvironment('PROD')">PROD</button>
+        </div>
+        <p id="currentEnv">Current Environment: DEV</p>
+    </section>
+
+    <section class="deployment">
+        <h2>Blue-Green Deployment</h2>
+        <p id="deploymentStatus">Current Deployment: 🔵 Blue</p>
+        <button onclick="toggleDeployment()">Switch Deployment</button>
+    </section>
+
+    <section class="metrics">
+        <h2>Server Metrics</h2>
+        <p id="cpu">CPU Usage: --%</p>
+        <p id="memory">Memory Usage: --%</p>
+    </section>
+
+    <section class="deploy-action">
+        <h2>CI/CD Pipeline</h2>
+        <button onclick="deploy()">🚀 Deploy New Version</button>
+        <p id="deployMessage"></p>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
