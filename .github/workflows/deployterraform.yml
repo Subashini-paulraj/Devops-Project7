@@ -1,0 +1,67 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+    workflow_dispatch:
+    
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️ Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️ Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 3️ Terraform Init
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      # 4️ Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      # 5️ Build Docker Image
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+
+      # 6️ Login to ECR
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin $ECR_REPOSITORY
+
+      # 7️ Push Image
+      - name: Push Docker image to ECR
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker push $ECR_REPOSITORY:$IMAGE_TAG
+
+      # 8️ Update ECS Service
+      - name: Force new ECS deployment
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --force-new-deployment
