@@ -1,11 +1,8 @@
 name: Deploy to AWS ECS
 
 on:
-  push:
-    branches:
-      - main
     workflow_dispatch:
-    
+
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -34,10 +31,12 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
+        working-directory: project7-terraform
         run: terraform init
 
       # 4️ Terraform Apply
       - name: Terraform Apply
+        working-directory: project7-terraform
         run: terraform apply -auto-approve
 
       # 5️ Build Docker Image
