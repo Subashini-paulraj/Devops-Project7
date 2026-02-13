@@ -1,24 +1,21 @@
-name: Deploy to AWS ECS
+name: Destroy Infrastructure
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # Manual trigger only
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
 
 jobs:
-  deploy:
+  destroy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️ Checkout
+      # Checkout
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️ Configure AWS credentials
+      # Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -26,17 +23,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 3️ Terraform Init
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # Terraform Init
       - name: Terraform Init
         working-directory: project7-terraform
         run: terraform init
 
-      # 4️ Terraform Apply
-      - name: Terraform Apply
+      # Terraform Destroy
+      - name: Terraform Destroy
         working-directory: project7-terraform
-        run: terraform apply -auto-approve
-
-   
+        run: terraform destroy -auto-approve
